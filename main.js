@@ -65,8 +65,9 @@ var jump = false;
 
 var STATE_SPLASH = 0;
 var STATE_GAME = 1;
-var STATE_GAMEOVER = 2;
-var STATE_WIN = 3;
+var STATE_DEAD = 2
+var STATE_GAMEOVER = 3;
+var STATE_WIN = 4;
 var gameState = STATE_SPLASH;
 
 var bulletIcon = document.createElement("img");
@@ -283,7 +284,6 @@ function runSplash(deltaTime)
 		return;
 	}
 
-	drawMap();
 
 	context.font = "bold 40px Ariel";
 	context.fillStyle = "#000000"
@@ -293,12 +293,12 @@ function runSplash(deltaTime)
 function runGame(deltaTime)
 {
 	player.update(deltaTime);
-
-	drawMap();
 	player.draw();
-	
 
-	for(var i = 0; i < enemies.length; i++)
+	time -= deltaTime;
+
+
+	/*for(var i = 0; i < enemies.length; i++)
 	{
 		enemies[i].update(deltaTime)
 	}
@@ -306,7 +306,7 @@ function runGame(deltaTime)
 	for(var i=0; i<enemies.length; i++)
   	{
   		enemies[i].draw();
-  	}
+  	}*/
 
 
 
@@ -333,11 +333,49 @@ function runGame(deltaTime)
 	context.fillStyle = "#f00";
 	context.font="14px Arial";
 	context.fillText("FPS: " + fps, 5, 20, 100);*/
+
+	context.fillStyle = "red";
+	context.font = "32px Arial";
+	var timeText = "Time Left: " + time;
+	context.fillText(timeText, SCREEN_WIDTH - 630, 35)
+
+	for(var i = 0; i < lives + 1; i++)
+	{
+		context.drawImage(heartImage, 15 + ((heartImage.width + 2)* i), 40);
+	}
+}
+
+function runDead(deltaTime)
+{
+	if(keyboard.isKeyDown(keyboard.KEY_E) == true)
+	{
+		gameState = STATE_GAME;
+	}
+
+
+
+	context.font="72px Verdana";	
+	context.fillStyle = "red";	
+	var width =  context.measureText("YOU DIED").width;
+	context.fillText("YOU DIED", SCREEN_WIDTH/2 - width/2, SCREEN_HEIGHT/2);		
+	
+	context.font="18px Verdana";	
+	context.fillStyle = "#000";	
+	width =  context.measureText("Press E to Try Again.").width;
+	context.fillText("Press E to Try Again.", SCREEN_WIDTH/2 - width/2, 300);
 }
 
 function runGameOver(deltaTime)
 {
+	context.font="72px Verdana";	
+	context.fillStyle = "red";	
+	var width =  context.measureText("GAME OVER").width;
+	context.fillText("GAME OVER", SCREEN_WIDTH/2 - width/2, SCREEN_HEIGHT/2);
 
+	context.font="18px Verdana";	
+	context.fillStyle = "#000";	
+	width =  context.measureText("Press F5 to Try Again.").width;
+	context.fillText("Press F5 to Try Again.", SCREEN_WIDTH/2 - width/2, 300);
 }
 
 function runWin(deltaTime)
@@ -356,6 +394,8 @@ function run()
 	context.fillStyle = "#ccc";		
 	context.fillRect(0, 0, canvas.width, canvas.height);
 
+	drawMap();
+
 	var deltaTime = getDeltaTime();
 
 	switch(gameState)
@@ -366,6 +406,10 @@ function run()
 
 		case STATE_GAME:
 			runGame(deltaTime);
+			break;
+
+		case STATE_DEAD:
+			runDead(deltaTime);
 			break;
 
 		case STATE_GAMEOVER:

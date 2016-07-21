@@ -1,3 +1,9 @@
+var time = 15;
+
+var lives = 2;
+var heartImage = document.createElement("img");
+heartImage.src = "heart.png"
+
 var LEFT = 0;
 var RIGHT = 1;
 
@@ -217,11 +223,28 @@ Player.prototype.update = function(deltaTime)
 			this.sprite.setAnimation(ANIM_JUMP_LEFT);
 		}
 	}
-	if(cellAtTileCoord(LAYER_OBJECT_TRIGGERS, tx, ty) == true)
+	if(cellAtTileCoord(LAYER_OBJECT_TRIGGERS, tx, ty) == true && this.position.x > 0 && this.position.y < SCREEN_HEIGHT && this.position.y > 0)
 	{
 		sfxVictory.play();
 		gameState = STATE_WIN;
 		musicBackground.stop;
+
+	}
+
+	if(this.position.y > SCREEN_HEIGHT || time <= 0)
+	{
+		if(lives > 0)
+		{
+		gameState = STATE_DEAD;
+		lives -= 1;
+		this.position.x = SCREEN_WIDTH/2;
+		this.position.y = SCREEN_HEIGHT/2;
+		time = 15
+	}
+		else
+		{
+			gameState = STATE_GAMEOVER;
+		}
 
 	}
 }
